@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Get Coins - Payment System Blueprint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #10141c 0%, #0b0e14 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px;
+        }
+
+        /* main card container */
+        .coins-container {
+            max-width: 560px;
+            width: 100%;
+            background: #1a1f2b;
+            border-radius: 48px 48px 40px 40px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* header with coin logo */
+        .header-section {
+            padding: 28px 28px 16px 28px;
+            background: linear-gradient(135deg, #232a3a 0%, #141a26 100%);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .coin-icon {
+            background: radial-gradient(circle at 35% 30%, #FFD966, #F5B042);
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,200,0.6);
+            position: relative;
+        }
+
+        .coin-icon::after {
+            content: "🪙";
+            font-size: 36px;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE6A3, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .enter-username {
+            background: #0f121b;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin: 16px 0 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #2e3548;
+        }
+
+        .enter-username span {
+            color: #9aa3bb;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .enter-username .username-placeholder {
+            color: #f5c542;
+            font-weight: 600;
+            background: #1e2436;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        /* recharge note */
+        .recharge-note {
+            background: #0f121bcc;
+            backdrop-filter: blur(4px);
+            padding: 12px 16px;
+            border-radius: 32px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #b9c3e0;
+            border: 0.5px solid #2f3b4e;
+        }
+
+        .recharge-note::before {
+            content: "⚡";
+            font-size: 18px;
+        }
+
+        /* coin packages grid */
+        .packages-section {
+            padding: 24px 24px 16px 24px;
+        }
+
+        .section-title {
+            color: #dfe6ff;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            font-size: 22px;
+        }
+
+        .coins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .coin-card {
+            background: #252c3f;
+            border-radius: 28px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #3b445e;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .coin-card:hover {
+            background: #2f384f;
+            transform: translateY(-3px);
+            border-color: #f5b042;
+        }
+
+        .coin-card.active {
+            background: linear-gradient(145deg, #f5b04220, #ffd96620);
+            border: 2px solid #F5B042;
+            box-shadow: 0 0 12px rgba(245, 176, 66, 0.4);
+        }
+
+        .coin-emoji-big {
+            font-size: 38px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .coin-amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: #FFE3A4;
+            letter-spacing: 1px;
+        }
+
+        .coin-price {
+            font-size: 15px;
+            color: #b9c3e0;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .custom-btn {
+            background: #1e2538;
+            border-radius: 40px;
+            padding: 14px 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #FFD966;
+            border: 1px dashed #F5B042;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+
+        .custom-btn:hover {
+            background: #2a3148;
+        }
+
+        /* invite & special offer row */
+        .features-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 24px 20px 24px;
+            border-top: 1px solid #2a3146;
+            background: #151c29;
+        }
+
+        .feature-chip {
+            background: #20273b;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #cfdcff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: default;
+        }
+
+        .feature-chip.gold {
+            background: #f5b04220;
+            border: 1px solid #f5b04260;
+            color: #FFD966;
+        }
+
+        .special-offer {
+            background: #f5b04210;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffcf7a;
+        }
+
+        /* payment footer */
+        .payment-footer {
+            padding: 20px 24px 28px;
+            background: #0e121d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-top: 1px solid #2b3143;
+        }
+
+        .visa-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #1b2132;
+            padding: 8px 16px;
+            border-radius: 60px;
+        }
+
+        .visa-badge span {
+            font-weight: 700;
+            color: #ffffffcc;
+            letter-spacing: 1px;
+        }
+
+        .buy-button {
+            background: linear-gradient(95deg, #F5B042, #E69500);
+            border: none;
+            padding: 14px 36px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 18px;
+            color: #121826;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(245, 176, 66, 0.3);
+        }
+
+        .buy-button:hover {
+            transform: scale(1.02);
+            background: linear-gradient(95deg, #FFC65A, #FFA41F);
+            box-shadow: 0 6px 16px rgba(245, 176, 66, 0.5);
+        }
+
+        /* MODAL / POPUP MESSAGE (like screenshot style) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .popup-card {
+            max-width: 440px;
+            width: 90%;
+            background: #1c2332;
+            border-radius: 48px;
+            box-shadow: 0 30px 45px rgba(0,0,0,0.5), 0 0 0 1px #ffd96630;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .modal-overlay.active .popup-card {
+            transform: scale(1);
+        }
+
+        .popup-header {
+            background: #0f121e;
+            padding: 24px 24px 16px;
+            text-align: center;
+            border-bottom: 1px solid #2f3a55;
+        }
+
+        .popup-header h3 {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFD966, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .transfer-details {
+            padding: 20px 24px;
+            background: #151e2c;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2c354b;
+            font-size: 15px;
+        }
+
+        .detail-label {
+            color: #8f9bb5;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #f0f3ff;
+            font-weight: 600;
+            word-break: break-word;
+            text-align: right;
+        }
+
+        .highlight {
+            color: #FFD966;
+            font-weight: 800;
+        }
+
+        .status-complete {
+            background: #2a7a3b30;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: #6fef8a;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .popup-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #111725;
+        }
+
+        .close-popup {
+            background: #2d364f;
+            border: none;
+            padding: 10px 26px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .close-popup:hover {
+            background: #3f4a6b;
+        }
+
+        /* extra badge */
+        .request-badge {
+            background: #f5b04220;
+            border-radius: 24px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #ffcd7e;
+        }
+
+        @media (max-width: 480px) {
+            .coins-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .payment-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .buy-button {
+                text-align: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="coins-container">
+    <!-- Header with coin logo -->
+    <div class="header-section">
+        <div class="logo-area">
+            <div class="coin-icon"></div>
+            <
